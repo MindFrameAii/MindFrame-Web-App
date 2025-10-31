@@ -1,65 +1,83 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>MindFrame - Focus Monitor</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding-top: 40px;
-      background: #f4f9ff;
-    }
-    h1 {
-      color: #0066cc;
-    }
-    #status-box {
-      margin-top: 30px;
-      padding: 20px;
-      border-radius: 10px;
-      width: 350px;
-      margin-left: auto;
-      margin-right: auto;
-      background: white;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
-    }
-    #recommend {
-      font-weight: bold;
-      color: #333;
-    }
-  </style>
+    <title>MindFrame - AI Focus Monitoring</title>
+
+    <!-- Load Face API -->
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
+
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+
+        #videoBox {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            border: 2px solid black;
+            border-radius: 6px;
+        }
+
+        #statusBox {
+            margin-top: 300px;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        #recommendation {
+            margin-top: 10px;
+            font-size: 22px;
+        }
+    </style>
 </head>
+
 <body>
 
 <h1>MindFrame - AI Focus Monitoring</h1>
-<p>Webcam and analysis begins automatically.</p>
 
-<div id="status-box">
-  <p><strong>Focus State:</strong> <span id="state">Detecting...</span></p>
-  <p><strong>Recommendation:</strong> <span id="recommend">Please wait...</span></p>
-</div>
+<!-- Webcam feed -->
+<video id="videoBox" width="200" height="150" autoplay muted></video>
+
+<div id="statusBox">Detecting...</div>
+<div id="recommendation"></div>
 
 <script>
-async function sendData() {
-  const payload = {
-    brightness: 120,
-    audio_level: 0.02,
-    wpm: 22,
-    emotion: "happy",
-    sentiment: "positive"
-  };
+    Promise.all([
+        faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js/weights'),
+        faceapi.nets.faceExpressionNet.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js/weights')
+    ]).then(startVideo);
 
-  let response = await fetch("/analyze", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify(payload)
-  });
+    function startVideo() {
+        navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+            document.getElementById('videoBox').srcObject = stream;
+        });
+        analyze();
+    }
 
-  let result = await response.json();
-  document.getElementById("state").innerText = result.state;
-  document.getElementById("recommend").innerText = result.recommendation;
-}
+    async function analyze() {
+        const video = document.getElementById('videoBox');
 
-setInterval(sendData, 2500);
+        const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceExpressions();
+
+        let state = "Analyzing...";
+        let advice = "";
+
+        if (detection) {
+            const mood = detection.expressions;
+            const tired = mood.sad + mood.angry;
+            const neutral = mood.neutral;
+            const focused = mood.happy + mood.surprised;
+
+            if (focused > 0.5) { state = "Focused 🙂"; advice = "Great! Continue studying."; }
+            else if (neutral > 0.5) { state = "Neutral 😐"; advice = "Maintain attention."; }
+            else if (tired > 0.4) { state = "Tired 😴"; advice = "Take a short 2-minute break."; }
+            else { state = "Distracted 😕"; advice = "Try refocusing. Remove distractions."; }
+        }
+
+        document.getElementById("statusBox").innerHTML = state;
+        document.getElementById("recommendation").innerHTML = advice;
+
+        requestAnimationFrame(analyze);
+    }
 </script>
 
 </body>
