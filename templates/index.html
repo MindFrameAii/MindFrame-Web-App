@@ -2,127 +2,43 @@
 <html>
 <head>
     <title>MindFrame - AI Focus Monitoring</title>
+
+    <!-- Load Face API -->
     <script defer src="https://cdn.jsdelivr.net/npm/face-api.js"></script>
 
     <style>
-        #scoreContainer {
-            width: 80%;
-            height: 22px;
-            border-radius: 12px;
-            background: rgba(255,255,255,0.2);
-            margin: 15px auto;
-            overflow: hidden;
-        }
-
-        #scoreBar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #ff4ccf, #4CC9FF);
-            transition: width 0.5s ease-out;
-            border-radius: 12px;
-        }
-        #scoreValue {
-            font-size: 22px;
-            margin-top: 6px;
-
-        }
-
-        h1 {
-            margin-top: 30px;
-            font-size: 38px;
-            font-weight: 600;
-            color: #4CC9FF;
-            text-shadow: 0px 0px 12px #4CC9FF;
-        }
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
 
         #videoBox {
             position: absolute;
             top: 20px;
             left: 20px;
-            border-radius: 14px;
-            border: 2px solid #4CC9FF;
-            box-shadow: 0px 0px 15px #4CC9FF;
-        }
-
-        #panel {
-            margin-top: 220px;
-            padding: 30px;
-            width: 60%;
-            margin-left: auto;
-            margin-right: auto;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 14px;
-            backdrop-filter: blur(8px);
-            box-shadow: 0 0 25px rgba(76, 201, 255, 0.4);
-            animation: fadeIn 1s ease-in-out;
+            border: 2px solid black;
+            border-radius: 6px;
         }
 
         #statusBox {
-            font-size: 42px;
-            margin-bottom: 10px;
+            margin-top: 300px;
+            font-size: 28px;
             font-weight: bold;
         }
 
         #recommendation {
-            font-size: 24px;
-            opacity: 0.9;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            margin-top: 10px;
+            font-size: 22px;
         }
     </style>
 </head>
 
 <body>
 
-<h1>MIND FRAME — AI FOCUS MONITORING SYSTEM</h1>
+<h1>MindFrame - AI Focus Monitoring</h1>
 
+<!-- Webcam feed -->
 <video id="videoBox" width="200" height="150" autoplay muted></video>
-<div id="aiLogo">AI</div>
 
-<div id="panel">
-    <div id="statusBox">Detecting...</div>
-    <div id="recommendation">Please stay still...</div>
-
-    <h3 style="margin-top: 25px;">Productivity Score</h3>
-    <div id="scoreContainer">
-        <div id="scoreBar"></div>
-    </div>
-    <div id="scoreValue">0%</div>
-    #panel {
-    animation: glowPulse 2.5s infinite ease-in-out;
-}
-
-@keyframes glowPulse {
-    0% { box-shadow: 0 0 15px #4CC9FF; }
-    50% { box-shadow: 0 0 35px #4CC9FF; }
-    100% { box-shadow: 0 0 15px #4CC9FF; }
-}#aiLogo {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    width: 65px;
-    height: 65px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #4CC9FF, #B14CFF);
-    box-shadow: 0px 0px 25px #4CC9FF;
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-    font-size: 22px;
-    animation: pulseGlow 2.5s infinite ease-in-out;
-}
-
-@keyframes pulseGlow {
-    0% { box-shadow: 0 0 18px #4CC9FF; transform: scale(1); }
-    50% { box-shadow: 0 0 38px #B14CFF; transform: scale(1.12); }
-    100% { box-shadow: 0 0 18px #4CC9FF; transform: scale(1); }
-}
-</div>
+<div id="statusBox">Detecting...</div>
+<div id="recommendation"></div>
 
 <script>
     Promise.all([
@@ -131,19 +47,19 @@
     ]).then(startVideo);
 
     function startVideo() {
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(stream => document.getElementById('videoBox').srcObject = stream);
+        navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
+            document.getElementById('videoBox').srcObject = stream;
+        });
         analyze();
     }
 
     async function analyze() {
         const video = document.getElementById('videoBox');
+
         const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions()).withFaceExpressions();
 
-        let status = "Analyzing...";
+        let state = "Analyzing...";
         let advice = "";
-        
-        if (!window.score) window.score = 50; // Start score mid-level (50%)
 
         if (detection) {
             const mood = detection.expressions;
@@ -151,13 +67,13 @@
             const neutral = mood.neutral;
             const focused = mood.happy + mood.surprised;
 
-            if (focused > 0.5) { status = "FOCUSED ✅"; advice = "Great work — continue studying."; }
-            else if (neutral > 0.5) { status = "NEUTRAL 😐"; advice = "Maintain attention."; }
-            else if (tired > 0.4) { status = "TIRED 😴"; advice = "Take a short 2–3 min break."; }
-            else { status = "DISTRACTED 😕"; advice = "Please remove distractions & re-focus."; }
+            if (focused > 0.5) { state = "Focused 🙂"; advice = "Great! Continue studying."; }
+            else if (neutral > 0.5) { state = "Neutral 😐"; advice = "Maintain attention."; }
+            else if (tired > 0.4) { state = "Tired 😴"; advice = "Take a short 2-minute break."; }
+            else { state = "Distracted 😕"; advice = "Try refocusing. Remove distractions."; }
         }
 
-        document.getElementById("statusBox").innerHTML = status;
+        document.getElementById("statusBox").innerHTML = state;
         document.getElementById("recommendation").innerHTML = advice;
 
         requestAnimationFrame(analyze);
