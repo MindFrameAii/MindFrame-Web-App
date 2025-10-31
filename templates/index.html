@@ -90,6 +90,15 @@
         <div id="scoreBar"></div>
     </div>
     <div id="scoreValue">0%</div>
+    #panel {
+    animation: glowPulse 2.5s infinite ease-in-out;
+}
+
+@keyframes glowPulse {
+    0% { box-shadow: 0 0 15px #4CC9FF; }
+    50% { box-shadow: 0 0 35px #4CC9FF; }
+    100% { box-shadow: 0 0 15px #4CC9FF; }
+}
 </div>
 
 <script>
