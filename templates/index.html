@@ -80,6 +80,7 @@
 <h1>MIND FRAME — AI FOCUS MONITORING SYSTEM</h1>
 
 <video id="videoBox" width="200" height="150" autoplay muted></video>
+<div id="aiLogo">AI</div>
 
 <div id="panel">
     <div id="statusBox">Detecting...</div>
@@ -98,6 +99,28 @@
     0% { box-shadow: 0 0 15px #4CC9FF; }
     50% { box-shadow: 0 0 35px #4CC9FF; }
     100% { box-shadow: 0 0 15px #4CC9FF; }
+}#aiLogo {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #4CC9FF, #B14CFF);
+    box-shadow: 0px 0px 25px #4CC9FF;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 22px;
+    animation: pulseGlow 2.5s infinite ease-in-out;
+}
+
+@keyframes pulseGlow {
+    0% { box-shadow: 0 0 18px #4CC9FF; transform: scale(1); }
+    50% { box-shadow: 0 0 38px #B14CFF; transform: scale(1.12); }
+    100% { box-shadow: 0 0 18px #4CC9FF; transform: scale(1); }
 }
 </div>
 
