@@ -110,6 +110,8 @@
 
         let status = "Analyzing...";
         let advice = "";
+        
+        if (!window.score) window.score = 50; // Start score mid-level (50%)
 
         if (detection) {
             const mood = detection.expressions;
