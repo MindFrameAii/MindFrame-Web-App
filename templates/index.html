@@ -1,1 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MindFrame - Focus Monitor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 40px;
+      background: #f4f9ff;
+    }
+    h1 {
+      color: #0066cc;
+    }
+    #status-box {
+      margin-top: 30px;
+      padding: 20px;
+      border-radius: 10px;
+      width: 350px;
+      margin-left: auto;
+      margin-right: auto;
+      background: white;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+    }
+    #recommend {
+      font-weight: bold;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
 
+<h1>MindFrame - AI Focus Monitoring</h1>
+<p>Webcam and analysis begins automatically.</p>
+
+<div id="status-box">
+  <p><strong>Focus State:</strong> <span id="state">Detecting...</span></p>
+  <p><strong>Recommendation:</strong> <span id="recommend">Please wait...</span></p>
+</div>
+
+<script>
+async function sendData() {
+  const payload = {
+    brightness: 120,
+    audio_level: 0.02,
+    wpm: 22,
+    emotion: "happy",
+    sentiment: "positive"
+  };
+
+  let response = await fetch("/analyze", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify(payload)
+  });
+
+  let result = await response.json();
+  document.getElementById("state").innerText = result.state;
+  document.getElementById("recommend").innerText = result.recommendation;
+}
+
+setInterval(sendData, 2500);
+</script>
+
+</body>
+</html>
