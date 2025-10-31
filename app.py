@@ -51,7 +51,6 @@ def analyze():
 def download_log(filename):
     return send_from_directory('logs', filename, as_attachment=True)
 
-if __name__ == '__main__':
 import os
 port = int(os.environ.get("PORT", 5000))
 app.run(host='0.0.0.0', port=port)   
