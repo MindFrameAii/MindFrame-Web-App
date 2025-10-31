@@ -41,10 +41,10 @@
 <div id="recommendation"></div>
 
 <script>
-    Promise.all([
-        faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js/weights'),
-        faceapi.nets.faceExpressionNet.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js/weights')
-    ]).then(startVideo);
+   Promise.all([
+    faceapi.nets.tinyFaceDetector.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models'),
+    faceapi.nets.faceExpressionNet.loadFromUri('https://justadudewhohacks.github.io/face-api.js/models')
+]).then(startVideo);
 
     function startVideo() {
         navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
